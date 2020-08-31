@@ -1,7 +1,8 @@
 #ifndef LOGIC_H
 #define LOGIC_H
 
-#include "MovingLib.h"
+#include "Moving.h"
+#include "voice.h"
 
 #define DEBUGMODE true
 #define ULTRASONICDELAY_LOW 3
@@ -126,6 +127,7 @@ public:
 
 private:
 
+  Voice voice;
   Moving moving;
   int ultraSonicPins[19];
   

@@ -16,9 +16,6 @@
 //#define ULTRASONIC_SECOND_TRIG 7  
 //#define ULTRASONIC_SECOND_ECHO 8  
 
-#define SERVOPIN0 5 
-#define SERVOPIN1 6 
-
 // Main core  
 
 Logic *core;  
@@ -41,21 +38,18 @@ void setup()
     FIRSTCONTROLLPIN,   
     SECONDCONTROLLPIN,  
     BLUETOOTHPIN_ZERO,  
-    BLUETOOTHPIN_ONE, 
-    SERVOPIN0,  
-    SERVOPIN1,  
+    BLUETOOTHPIN_ONE,  
     ultrasonic  
   );    
 
-  voice = new VoiceText();
-
   core->init(); 
-  core->check();  
+  voice = new VoiceTest();
+  //core->check();  
 
   pinMode(8, OUTPUT); 
 } 
 
 void loop()   
 { 
-  voice.start();
+  voice->start();
 }

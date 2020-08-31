@@ -4,17 +4,18 @@
 #include <SoftwareSerial.h>
 #include <VoiceRecognitionV3.h>
 
-#define onRecord (0)
-#define offRecord (1) 
-#define onRecord1 (2)
-#define offRecord1 (3)
+#define stopCom (0)
+#define forwardCom (1) 
+#define backwardCom (2)
+#define leftCom (3)
+#define rightCom (4)
 
 class Voice
 {
 public:
   Voice();
   void init();
-  void loopFunc();
+  int loopFunc();
   void timerIsr();
   void printVR(uint8_t *buf);
   void printSignature(uint8_t *buf, int len);
@@ -45,46 +46,35 @@ void Voice::init()
     Serial.println("Please check connection and restart Arduino.");
     while(1);
   }
-  if(myVR->load((uint8_t)onRecord) &gt;= 0)
-    Serial.println("onRecord loaded");
-  if(myVR->load((uint8_t)offRecord) &gt;= 0)
-    Serial.println("offRecord loaded");
-  if(myVR->load((uint8_t)onRecord1) &gt;= 0)
-    Serial.println("onRecord1 loaded");
-  if(myVR->load((uint8_t)offRecord1) &gt;= 0)
-    Serial.println("offRecord1 loaded");
+  if(myVR->load((uint8_t)stopCom) >= 0)
+    Serial.println("Stop: loaded");
+    
+  if(myVR->load((uint8_t)forwardCom) >= 0)
+    Serial.println("Forward: loaded");
+
+  if(myVR->load((uint8_t)backwardCom) >= 0)
+    Serial.println("Backward: loaded");
+
+  if(myVR->load((uint8_t)leftCom) >= 0)
+    Serial.println("Left: loaded");
+
+  if(myVR->load((uint8_t)rightCom) >= 0)
+    Serial.println("Right: loaded");
 }
 
-void Voice::loopFunc()
+int Voice::loopFunc()
 {
   int ret;
   ret = myVR->recognize(buf, 50);
-  if(ret&gt;0)
+  if(ret > 0)
   {
-    switch(buf[1]){
-      case onRecord:
-        /** turn on LED */
-        digitalWrite(led, HIGH);
-      break;
-      case offRecord:
-      /** turn off LED*/
-        digitalWrite(led, LOW);
-      break;
-      case onRecord1:
-      /** turn on LED */
-        digitalWrite(led1, HIGH);
-      break;
-      case offRecord1:
-      /** turn off LED*/
-        digitalWrite(led1, LOW);
-      break;
-      default:
-        Serial.println("Record function undefined");
-      break;
-    }
-    /** voice recognized */
+    if (ret > 4)
+      ret = ret - 4;
+      
+    return ret;
     printVR(buf);
   }  
+  return -2;
 }
 
 void Voice::printVR(uint8_t *buf)
