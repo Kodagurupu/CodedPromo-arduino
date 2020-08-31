@@ -51,5 +51,6 @@ void setup()
 
 void loop()   
 { 
-  voice->start();
+  int command = voice->start();
+  core->sendCommand(command - 1);
 }

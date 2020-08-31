@@ -10,9 +10,9 @@ public:
   {
     voice.init();  
   }
-  void start()
+  int start()
   {
-    voice.loopFunc();
+    return voice.loopFunc();
   }
 
 private:

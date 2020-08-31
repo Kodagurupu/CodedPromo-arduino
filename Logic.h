@@ -82,7 +82,16 @@ public:
     return true;
   }
 
-  void ReadSerial() 
+  void sendCommand(int command)
+  {
+    if ( command == -1 ) stopMoving();
+    if ( command == 0 ) goForward();
+    if ( command == 1 ) goBackward();
+    if ( command == 2 ) turnLeft();
+    if ( command == 3 ) turnRight();
+  }
+
+  void readSerial() 
   {
     if ( Serial.available() > 0 )
     {
