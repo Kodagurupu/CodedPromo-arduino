@@ -3,6 +3,7 @@
  * Arduino: mega
 */  
 #include "Logic.h"
+#include "Ultrasonic.h"
 
 /*
  * Pins list
@@ -33,23 +34,44 @@ Logic *core;
 
 void setup()  
 { 
-  short unsigned int ultrasonic[19]; 
-  for (short unsigned int i = 0; i < 20; i++) ultrasonic[i] = 0; 
-  ultrasonic[0] = ULTRASONIC_ZERO_TRIG; 
-  ultrasonic[1] = ULTRASONIC_ZERO_ECHO; 
-  ultrasonic[2] = ULTRASONIC_FIRST_TRIG;  
-  ultrasonic[3] = ULTRASONIC_FIRST_ECHO;  
-  ultrasonic[4] = ULTRASONIC_SECOND_TRIG; 
-  ultrasonic[5] = ULTRASONIC_SECOND_ECHO;
-  ultrasonic[6] = ULTRASONIC_THIRD_TRIG;
-  ultrasonic[7] = ULTRASONIC_THIRD_ECHO; 
+  Module modules[4];
+  struct Module firstFrontModule = 
+  { 
+    .type = FRONT, 
+    .trigPin = ULTRASONIC_ZERO_TRIG, 
+    .echoPin = ULTRASONIC_ZERO_ECHO 
+  };
+  struct Module secondFrontModule = 
+  { 
+    .type = FRONT, 
+    .trigPin = ULTRASONIC_FIRST_TRIG, 
+    .echoPin = ULTRASONIC_FIRST_ECHO 
+  };
+  struct Module thirdFrontModule = 
+  { 
+    .type = FRONT, 
+    .trigPin = ULTRASONIC_SECOND_TRIG, 
+    .echoPin = ULTRASONIC_SECOND_ECHO 
+  };
 
+  struct Module firstBackModule = 
+  { 
+    .type = BACK, 
+    .trigPin = ULTRASONIC_THIRD_TRIG, 
+    .echoPin = ULTRASONIC_THIRD_ECHO 
+  };
+ 
+  modules[0] = firstFrontModule;
+  modules[1] = secondFrontModule;
+  modules[2] = thirdFrontModule;
+  modules[3] = firstBackModule;
+  
   core = new Logic( 
     FIRSTCONTROLLPIN,   
     SECONDCONTROLLPIN,  
     THIRDCONTROLLPIN,  
     FOURTHCONTROLLPIN,  
-    ultrasonic  
+    modules  
   );    
 
   core->init();
@@ -57,5 +79,5 @@ void setup()
 
 void loop()   
 {
-  core->readEnternControlls();
+  core->readExternalControls();
 }

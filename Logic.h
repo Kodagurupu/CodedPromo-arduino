@@ -15,11 +15,11 @@ public:
     short unsigned int pin2,
     short unsigned int pin3,
     short unsigned int pin4,
-    short unsigned int ultrasonic[19]
+    Module devices[4]
   );
   void init();
   void sendCommand(short unsigned int command);
-  void readEnternControlls();
+  void readExternalControls();
   void stopMoving();
   void turnLeft();
   void turnRight();
@@ -38,7 +38,7 @@ Logic::Logic (
   short unsigned int pin2,
   short unsigned int pin3,
   short unsigned int pin4,
-  short unsigned int ultrasonic[19]
+  Module devices[4]
 ) 
   : moving(
       pin1,
@@ -46,14 +46,9 @@ Logic::Logic (
       pin3,
       pin4
     )
-{
-  // init ultrasonic pins
-  for (short unsigned int i = 0; i < 20; i++) 
-  {
-    if (ultrasonic[i] != 0) 
-      ultraSonicPins[i] = ultrasonic[i];
-    else ultraSonicPins[i] = 0;      
-  } 
+{ 
+  for (int i = 0; i < sizeof(devices) / sizeof(Module); i++)
+    ultrasonic.addDevice(devices[i]);
 }
 
 void Logic::init()
@@ -62,15 +57,6 @@ void Logic::init()
   
   Serial.begin(9600);
   Serial.println("[CORE] Initializing");  
-   
-  for (short unsigned int i = 0; i < 20; i++) 
-  {
-    if (ultraSonicPins[i] != 0) 
-    {
-      if ( i % 2 == 0 ) pinMode(ultraSonicPins[i], OUTPUT);
-      else pinMode(ultraSonicPins[i], INPUT);
-    }      
-  }
 
   voice.init();
   delay(500);
@@ -85,7 +71,7 @@ void Logic::sendCommand(short unsigned int command)
   if ( command == 3 ) turnRight();
 }
 
-void Logic::readEnternControlls()
+void Logic::readExternalControls()
 {
   // Read com port from laptop
   if ( Serial.available() > 0 )

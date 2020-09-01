@@ -7,18 +7,17 @@
 
 enum deviceType
 {
+  NONE = -1,
   FRONT = 0,
   BACK = 1
 };
 
 struct Module
 {
-public:
   deviceType type;
   short unsigned int trigPin;
   short unsigned int echoPin;
   long lastDistance;
-  bool active = false;
 };
 
 class Ultrasonic
@@ -45,8 +44,9 @@ Ultrasonic::Ultrasonic()
 {
   Serial.print("Module count: ");
   Serial.println(sizeof(modules) / sizeof(Module));
+  struct Module initModule {.type = NONE};
   for (int i = 0; i < sizeof(modules) / sizeof(Module); i++)
-    modules[i] = Module();
+    modules[i] = initModule;
 }
 
 void Ultrasonic::addDevice(Module device, int position)
@@ -54,15 +54,13 @@ void Ultrasonic::addDevice(Module device, int position)
   initDevice(device);
   if (position != -1 && position <= sizeof(modules) / sizeof(Module))
   {
-    device.active = true;
     modules[position] = device;
     return;
   }
   for (int i = 0; i < sizeof(modules) / sizeof(Module); i++)
   {
-    if (!modules[i].active)
+    if (modules[i].type != NONE)
     {
-      device.active = true;
       modules[i] = device;
       return;
     }
@@ -87,7 +85,7 @@ bool Ultrasonic::initDevice(Module device)
 
 void Ultrasonic::calcDistance(Module device)
 {
-  if (!device.active)
+  if (!device.type != NONE)
     return;
   long duration0, duration1, distance;
   blinkDevice(device);
@@ -103,7 +101,7 @@ float Ultrasonic::getAverage(deviceType type)
   short unsigned int modulesCount;
   for (int i = 0; i < sizeof(modules) / sizeof(Module); i++)
   {
-    if (modules[i].type == type && modules[i].active)
+    if (modules[i].type == type && modules[i].type != NONE)
     {
       distance += modules[i].lastDistance;
       modulesCount++;
