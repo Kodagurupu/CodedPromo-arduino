@@ -12,7 +12,7 @@ enum MovingMode
   Default = 0,
   Walking = 1,
   HumanControl = 2
-}
+};
 
 class Logic 
 {  
@@ -33,13 +33,13 @@ public:
   void moveRight();
   void goForward();
   void goBackward();
-  void toggleMode(MoveMode mode)
+  void toggleMode(MovingMode mode);
 
 private:
   Voice voice;
   Moving moving;
+  MovingMode _mode;
   Ultrasonic ultrasonic;
-  MoveMode _mode;
 };
 
 Logic::Logic (
@@ -62,8 +62,8 @@ Logic::Logic (
 
 void Logic::loopFunc()
 {
-  if (_mode == Defauld)
-    core->readExternalControls();
+  if (_mode == Default)
+    readExternalControls();
   if (_mode == Walking)
   {
     while (true)
@@ -153,7 +153,7 @@ void Logic::goBackward()
     moving.goBackward();
 }
 
-void toggleMode(MoveMode mode)
+void Logic::toggleMode(MovingMode mode)
 {
   if (_mode == mode)
     return;
