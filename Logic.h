@@ -7,6 +7,13 @@
 
 #define DEBUGMODE true
 
+enum MovingMode
+{
+  Default = 0,
+  Walking = 1,
+  HumanControl = 2
+}
+
 class Logic 
 {  
 public:
@@ -18,19 +25,21 @@ public:
     Module devices[4]
   );
   void init();
+  void loopFunc();
   void sendCommand(short unsigned int command);
   void readExternalControls();
   void stopMoving();
-  void turnLeft();
-  void turnRight();
+  void moveLeft();
+  void moveRight();
   void goForward();
   void goBackward();
+  void toggleMode(MoveMode mode)
 
 private:
   Voice voice;
   Moving moving;
   Ultrasonic ultrasonic;
-  short unsigned int ultraSonicPins[19];
+  MoveMode _mode;
 };
 
 Logic::Logic (
@@ -51,6 +60,32 @@ Logic::Logic (
     ultrasonic.addDevice(devices[i]);
 }
 
+void Logic::loopFunc()
+{
+  if (_mode == Defauld)
+    core->readExternalControls();
+  if (_mode == Walking)
+  {
+    while (true)
+    {
+      while(ultrasonic.canMove())
+        goForward();
+      moving.turnLeft();
+      if (!ultrasonic.canMove())
+      {
+        moving.turnLeft();
+        moving.turnLeft();
+
+         if (!ultrasonic.canMove())
+         moving.turnRight();
+      }
+    }
+  }
+  // Will add soon
+  if (_mode == HumanControl)
+    return;
+}
+
 void Logic::init()
 {
   //Init Seral
@@ -67,8 +102,8 @@ void Logic::sendCommand(short unsigned int command)
   if ( command == -1 ) stopMoving();
   if ( command == 0 ) goForward();
   if ( command == 1 ) goBackward();
-  if ( command == 2 ) turnLeft();
-  if ( command == 3 ) turnRight();
+  if ( command == 2 ) moveLeft();
+  if ( command == 3 ) moveRight();
 }
 
 void Logic::readExternalControls()
@@ -90,28 +125,39 @@ void Logic::stopMoving()
   moving.restore();
 }
 
-void Logic::turnLeft()
+void Logic::moveLeft()
 {
   if (DEBUGMODE) Serial.println("Turning left");
-  moving.turnLeft();  
+  if (ultrasonic.canMove())
+    moving.moveLeft();  
 }
 
-void Logic::turnRight()
+void Logic::moveRight()
 {
   if (DEBUGMODE) Serial.println("Turning right");
-  moving.turnRight();
+  if (ultrasonic.canMove())
+    moving.moveRight();
 }
 
 void Logic::goForward()
 {
   if (DEBUGMODE) Serial.println("Moving forward");
-  moving.goFoward();
+  if (ultrasonic.canMove())
+    moving.goFoward();
 }
 
 void Logic::goBackward()
 {
   if (DEBUGMODE) Serial.println("Moving backward");
-  moving.goBackward();
+  if (ultrasonic.canMove(BACK))
+    moving.goBackward();
+}
+
+void toggleMode(MoveMode mode)
+{
+  if (_mode == mode)
+    return;
+  _mode = mode;
 }
 
 #endif

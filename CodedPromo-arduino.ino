@@ -75,9 +75,10 @@ void setup()
   );    
 
   core->init();
+  core->toggleMode(Walking);
 } 
 
 void loop()   
 {
-  core->readExternalControls();
+  core->loopFunc();
 }

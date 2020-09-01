@@ -1,6 +1,8 @@
 #ifndef MOVING_H
 #define MOVING_H
 
+#define TURN_DELAY 1500
+
 class Moving 
 {
 public:
@@ -17,6 +19,8 @@ public:
   void goBackward();
   void turnLeft();
   void turnRight();
+  void moveLeft();
+  void moveRight();
   
 private:
   int relePin1;
@@ -55,6 +59,24 @@ void Moving::restore()
   digitalWrite( relePin4, LOW );
 }
 
+void Moving::turnLeft()
+{
+  restore();
+  delay(20);
+  digitalWrite( relePin3, HIGH );
+  delay(TURN_DELAY);
+  restore();
+}
+
+void Moving::turnRight()
+{
+  restore();
+  delay(20);
+  digitalWrite( relePin4, HIGH );
+  delay(TURN_DELAY);
+  restore();
+}
+
 void Moving::goFoward()
 {
   restore();
@@ -69,14 +91,14 @@ void Moving::goBackward()
   digitalWrite( relePin2, HIGH );
 }
 
-void Moving::turnLeft()
+void Moving::moveLeft()
 {
   restore();
   delay(20);
   digitalWrite( relePin3, HIGH );
 }
 
-void Moving::turnRight()
+void Moving::moveRight()
 {
   restore();
   delay(20);

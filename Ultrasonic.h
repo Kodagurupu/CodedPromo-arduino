@@ -29,7 +29,7 @@ public:
   bool initDevice(Module device);
   void calcDistance(Module device);
   float getAverage(deviceType type);
-  bool canMove(deviceType type);
+  bool canMove(deviceType type = FRONT);
 
 private:
   /*
