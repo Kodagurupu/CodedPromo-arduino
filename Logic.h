@@ -2,11 +2,10 @@
 #define LOGIC_H
 
 #include "Moving.h"
-#include "voice.h"
+#include "Voice.h"
+#include "Ultrasonic.h"
 
 #define DEBUGMODE true
-#define ULTRASONICDELAY_LOW 3
-#define ULTRASONICDELAY_HIGH 15
 
 class Logic 
 {  
@@ -19,19 +18,18 @@ public:
     short unsigned int ultrasonic[19]
   );
   void init();
-  void ultraSonicBlink(short unsigned int i);
   void sendCommand(short unsigned int command);
-  void readSerial();
+  void readEnternControlls();
   void stopMoving();
   void turnLeft();
   void turnRight();
   void goForward();
   void goBackward();
-  bool globalRules();
 
 private:
   Voice voice;
   Moving moving;
+  Ultrasonic ultrasonic;
   short unsigned int ultraSonicPins[19];
 };
 
@@ -58,36 +56,6 @@ Logic::Logic (
   } 
 }
 
-void Logic::ultraSonicBlink(short unsigned int i)
-{
-  digitalWrite(ultraSonicPins[i], LOW);
-  delayMicroseconds(ULTRASONICDELAY_LOW);
-  digitalWrite(ultraSonicPins[i], HIGH);
-  delayMicroseconds(ULTRASONICDELAY_HIGH);
-  digitalWrite(ultraSonicPins[i], LOW);
-}
-
-bool Logic::globalRules()
-{
-  // skip this to future realize
-  
-  return true;
-  for (short unsigned int i = 0; i < 19; i++) 
-  {
-    if (ultraSonicPins[i] != 0 && i % 2 == 0) 
-    {
-      long duration0, duration1, distance;
-      ultraSonicBlink(i);
-      duration0 = pulseIn(ultraSonicPins[i+1], HIGH);
-      ultraSonicBlink(i);
-      duration1 = pulseIn(ultraSonicPins[i+1], HIGH);
-      distance = ((duration0 + duration1) / 2) * 0.034/2;
-      if (distance < 10) return false;
-    }
-  }
-  return true;
-}
-
 void Logic::init()
 {
   //Init Seral
@@ -103,6 +71,8 @@ void Logic::init()
       else pinMode(ultraSonicPins[i], INPUT);
     }      
   }
+
+  voice.init();
   delay(500);
 }
 
@@ -115,13 +85,17 @@ void Logic::sendCommand(short unsigned int command)
   if ( command == 3 ) turnRight();
 }
 
-void Logic::readSerial()
+void Logic::readEnternControlls()
 {
+  // Read com port from laptop
   if ( Serial.available() > 0 )
   {
     int command = Serial.parseInt();
     sendCommand(command);
   }
+  // Read voice recognation module
+  short unsigned int command = voice.loopFunc();
+  sendCommand(command - 1);
 }
 
 void Logic::stopMoving()
