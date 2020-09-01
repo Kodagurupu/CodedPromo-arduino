@@ -2,12 +2,12 @@
  * Code for controlling robot movement  
 */  
 #include "Logic.h"
-#include "tests/voiceTest.h"
+#include "Voice.h"
 
 #define FIRSTCONTROLLPIN 9  
 #define SECONDCONTROLLPIN 10  
-#define BLUETOOTHPIN_ZERO 0 
-#define BLUETOOTHPIN_ONE 1  
+#define THIRDCONTROLLPIN 11 
+#define FOURTHCONTROLLPIN 12  
 
 #define ULTRASONIC_ZERO_TRIG 3  
 #define ULTRASONIC_ZERO_ECHO 4  
@@ -19,14 +19,14 @@
 // Main core  
 
 Logic *core;  
-VoiceTest *voice;
+
+// Testing voice
+Voice *voice;
 
 void setup()  
 { 
-  pinMode(8, OUTPUT); 
-
-  int ultrasonic[19]; 
-  for (int i = 0; i < 20; i++) ultrasonic[i] = 0; 
+  short unsigned int ultrasonic[19]; 
+  for (short unsigned int i = 0; i < 20; i++) ultrasonic[i] = 0; 
   ultrasonic[0] = ULTRASONIC_ZERO_TRIG; 
   ultrasonic[1] = ULTRASONIC_ZERO_ECHO; 
   //ultrasonic[2] = ULTRASONIC_FIRST_TRIG;  
@@ -37,20 +37,18 @@ void setup()
   core = new Logic( 
     FIRSTCONTROLLPIN,   
     SECONDCONTROLLPIN,  
-    BLUETOOTHPIN_ZERO,  
-    BLUETOOTHPIN_ONE,  
+    THIRDCONTROLLPIN,  
+    FOURTHCONTROLLPIN,  
     ultrasonic  
   );    
 
   core->init(); 
-  voice = new VoiceTest();
-  //core->check();  
-
-  pinMode(8, OUTPUT); 
+  voice = new Voice();
+  voice->init();
 } 
 
 void loop()   
-{ 
-  int command = voice->start();
+{
+  short unsigned int command = voice->loopFunc();
   core->sendCommand(command - 1);
 }
