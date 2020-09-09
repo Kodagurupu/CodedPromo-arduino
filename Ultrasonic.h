@@ -1,7 +1,8 @@
 #ifndef ULTRASONIC_H
 #define ULTRASONIC_H
 
-#define MIN_DISTANCE 5
+#define DEBUGMODE false
+#define MIN_DISTANCE 50
 #define ULTRASONICDELAY_LOW 3
 #define ULTRASONICDELAY_HIGH 15
 
@@ -27,7 +28,7 @@ public:
   void blinkDevice(Module device);
   void addDevice(Module device, int position = -1);
   bool initDevice(Module device);
-  void calcDistance(Module device);
+  float calcDistance(Module device);
   float getAverage(deviceType type);
   bool canMove(deviceType type = FRONT);
 
@@ -59,7 +60,7 @@ void Ultrasonic::addDevice(Module device, int position)
   }
   for (int i = 0; i < sizeof(modules) / sizeof(Module); i++)
   {
-    if (modules[i].type != NONE)
+    if (modules[i].type == NONE)
     {
       modules[i] = device;
       return;
@@ -71,51 +72,70 @@ bool Ultrasonic::initDevice(Module device)
 {
   pinMode(device.trigPin, OUTPUT);
   pinMode(device.echoPin, INPUT);
-  calcDistance(device);
+  device.lastDistance = calcDistance(device);
   if (device.lastDistance == 0)
   {
     Serial.print("Can't init device with pins: ");
     Serial.print(device.trigPin);
     Serial.print(", ");
-    Serial.println(device.echoPin);
+    Serial.print(device.echoPin);
+    Serial.print(".Incoming value: ");
+    Serial.println(device.lastDistance);
     return false;
   }
   return true;
 }
 
-void Ultrasonic::calcDistance(Module device)
+float Ultrasonic::calcDistance(Module device)
 {
-  if (!device.type != NONE)
-    return;
-  long duration0, duration1, distance;
+  if (device.type == NONE)
+    return 0;
+  long duration0, duration1;
   blinkDevice(device);
   duration0 = pulseIn(device.echoPin, HIGH);
   blinkDevice(device);
   duration1 = pulseIn(device.echoPin, HIGH);
-  device.lastDistance = ((duration0 + duration1) / 2) * 0.034/2;
+  return ((duration0 + duration1) / 2) * 0.034/2;
 }
 
 float Ultrasonic::getAverage(deviceType type)
 {
-  long distance;
-  short unsigned int modulesCount;
+  long distance = 0;
+  short unsigned int modulesCount = 0;
+  
   for (int i = 0; i < sizeof(modules) / sizeof(Module); i++)
   {
     if (modules[i].type == type && modules[i].type != NONE)
     {
+      if (DEBUGMODE)
+      {
+        Serial.print("Device at: ");
+        Serial.print(i);
+        Serial.print(" Return: ");
+        Serial.print(modules[i].lastDistance);
+        Serial.println(";");
+      }
       distance += modules[i].lastDistance;
       modulesCount++;
     }
   }
+  
+  if (DEBUGMODE)
+  {
+    Serial.print("Total distance");
+    Serial.print(distance / modulesCount);
+    Serial.println();
+  } 
   return distance / modulesCount;
 }
 
 bool Ultrasonic::canMove(deviceType type)
 {
   for (int i = 0; i < sizeof(modules) / sizeof(Module); i++)
-    calcDistance(modules[i]);
+    modules[i].lastDistance = calcDistance(modules[i]);
   
   float finalDistance = getAverage(type);
+  Serial.println(finalDistance);
   
   if (finalDistance <= MIN_DISTANCE) 
     return false;

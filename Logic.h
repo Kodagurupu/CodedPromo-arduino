@@ -5,7 +5,7 @@
 #include "Voice.h"
 #include "Ultrasonic.h"
 
-#define DEBUGMODE true
+#define DEBUGMODE false
 
 enum MovingMode
 {
@@ -34,8 +34,11 @@ public:
   void goForward();
   void goBackward();
   void toggleMode(MovingMode mode);
+  Module devices_[4];
 
 private:
+  
+  
   Voice voice;
   Moving moving;
   MovingMode _mode;
@@ -49,15 +52,18 @@ Logic::Logic (
   short unsigned int pin4,
   Module devices[4]
 ) 
-  : moving(
+  :
+    moving(
       pin1,
       pin2,
       pin3,
       pin4
     )
 { 
-  for (int i = 0; i < sizeof(devices) / sizeof(Module); i++)
-    ultrasonic.addDevice(devices[i]);
+  for (int i = 0; i < 4; i++)
+  {
+    devices_[i] = devices[i]; 
+  }
 }
 
 void Logic::loopFunc()
@@ -66,19 +72,17 @@ void Logic::loopFunc()
     readExternalControls();
   if (_mode == Walking)
   {
-    while (true)
+    Serial.println(ultrasonic.canMove());
+    while(ultrasonic.canMove())
+      goForward();
+    moving.turnLeft();
+    if (ultrasonic.canMove())
     {
-      while(ultrasonic.canMove())
-        goForward();
       moving.turnLeft();
-      if (!ultrasonic.canMove())
-      {
-        moving.turnLeft();
-        moving.turnLeft();
+      moving.turnLeft();
 
-         if (!ultrasonic.canMove())
-         moving.turnRight();
-      }
+       if (!ultrasonic.canMove())
+       moving.turnRight();
     }
   }
   // Will add soon
@@ -92,8 +96,12 @@ void Logic::init()
   
   Serial.begin(9600);
   Serial.println("[CORE] Initializing");  
+  Serial.println("This world is f*cking hard");
 
-  voice.init();
+  for (int i = 0; i < sizeof(devices_) / sizeof(Module); i++)
+    ultrasonic.addDevice(devices_[i]);
+
+  //voice.init();
   delay(500);
 }
 

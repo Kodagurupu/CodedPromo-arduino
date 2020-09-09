@@ -55,8 +55,8 @@ void Moving::restore()
 {
   digitalWrite( relePin1, LOW );
   digitalWrite( relePin2, LOW );
-  digitalWrite( relePin3, LOW );
-  digitalWrite( relePin4, LOW );
+  digitalWrite( relePin3, HIGH );
+  digitalWrite( relePin4, HIGH );
 }
 
 void Moving::turnLeft()
@@ -81,7 +81,7 @@ void Moving::goFoward()
 {
   restore();
   delay(20);
-  digitalWrite( relePin1, HIGH );
+  digitalWrite( relePin1, LOW );
 }
 
 void Moving::goBackward()

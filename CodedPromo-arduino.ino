@@ -25,8 +25,8 @@
 #define ULTRASONIC_FIRST_ECHO 7 
 #define ULTRASONIC_SECOND_TRIG 8  
 #define ULTRASONIC_SECOND_ECHO 13  
-#define ULTRASONIC_THIRD_TRIG 14
-#define ULTRASONIC_THIRD_ECHO 15
+#define ULTRASONIC_THIRD_TRIG 22
+#define ULTRASONIC_THIRD_ECHO 23
 
 // Main core  
 
@@ -80,5 +80,6 @@ void setup()
 
 void loop()   
 {
+ //core->stopMoving();
   core->loopFunc();
 }
