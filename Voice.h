@@ -38,14 +38,16 @@ void Voice::init()
   myVR = new VR(2, 3);
   myVR->begin(9600);
   pinMode(led, OUTPUT);
+  
   if (myVR->clear() == 0)
-     Serial.println("Recognizer cleared.");
+    Serial.println("Recognizer cleared.");
   else
   {
     Serial.println("Not find VoiceRecognitionModule.");
     Serial.println("Please check connection and restart Arduino.");
     while(1);
   }
+  
   if(myVR->load((uint8_t)stopCom) >= 0)
     Serial.println("Stop: loaded");
     
@@ -70,9 +72,9 @@ int Voice::loopFunc()
   {
     if (ret > 4)
       ret = ret - 4;
-      
-    return ret;
+
     printVR(buf);
+    return ret;
   }  
   return -2;
 }
@@ -82,6 +84,7 @@ void Voice::printVR(uint8_t *buf)
   Serial.println("VR Index\tGroup\tRecordNum\tSignature");
   Serial.print(buf[2], DEC);
   Serial.print("\t\t");
+  
   if (buf[0] == 0xFF)
       Serial.print("NONE");
   else if (buf[0]&0x80) 
@@ -96,10 +99,12 @@ void Voice::printVR(uint8_t *buf)
   Serial.print("\t");
   Serial.print(buf[1], DEC);
   Serial.print("\t\t");
+  
   if (buf[3] > 0)
       printSignature(buf+4, buf[3]);
   else
       Serial.print("NONE");
+  
   Serial.println("\r\n");
 }
 
