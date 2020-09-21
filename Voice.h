@@ -1,9 +1,13 @@
 #ifndef VOISE_H
 #define VOISE_H
 
+//Include extern libs
 #include <SoftwareSerial.h>
 #include <VoiceRecognitionV3.h>
 
+/*
+ * Declare all voice commands
+ */
 #define stopCom (0)
 #define forwardCom (1) 
 #define backwardCom (2)
@@ -30,9 +34,12 @@ private:
 
 Voice::Voice() 
 {
-  Serial.println("Elechouse Voice Recognition V3 Module\r\nControl LED sample");
+  Serial.println("Initializing voice lib");
 }
 
+/*
+ * Init voice module before loop
+ */
 void Voice::init()
 {
   myVR = new VR(2, 3);
@@ -43,11 +50,14 @@ void Voice::init()
     Serial.println("Recognizer cleared.");
   else
   {
-    Serial.println("Not find VoiceRecognitionModule.");
+    Serial.println("Can't found VoiceRecognitionModule.");
     Serial.println("Please check connection and restart Arduino.");
     while(1);
   }
-  
+
+  /*
+   * Load commands
+   */
   if(myVR->load((uint8_t)stopCom) >= 0)
     Serial.println("Stop: loaded");
     
@@ -64,6 +74,9 @@ void Voice::init()
     Serial.println("Right: loaded");
 }
 
+/*
+ * This function returns recived commands from voice module
+ */
 int Voice::loopFunc()
 {
   int ret;

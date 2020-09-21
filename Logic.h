@@ -1,12 +1,20 @@
 #ifndef LOGIC_H
 #define LOGIC_H
 
+// Including supporting libs
 #include "Moving.h"
 #include "Voice.h"
 #include "Ultrasonic.h"
 
+// Make true for view debug messages
 #define DEBUGMODE false
 
+/*
+ * Thre are few ways to controll this robot
+ * By default robot will catch signals from outside like serrial input, radio input etc.
+ * In walking mode robot will go around obstructions but you also can controll it by radio
+ * At human controll mode robot will stay for radio signals and ingone another
+ */
 enum MovingMode
 {
   Default = 0,
@@ -37,8 +45,6 @@ public:
   Module devices_[4];
 
 private:
-  
-  
   Voice voice;
   Moving moving;
   MovingMode _mode;
@@ -51,21 +57,23 @@ Logic::Logic (
   short unsigned int pin3,
   short unsigned int pin4,
   Module devices[4]
-) 
-  :
-    moving(
+) : moving(
       pin1,
       pin2,
       pin3,
       pin4
     )
 { 
-  for (int i = 0; i < 4; i++)
+  // Adding devices to list in extern lib
+  for (int i = 0; i < sizeof(devices) / sizeof(Module); i++)
   {
     devices_[i] = devices[i]; 
   }
 }
 
+/*
+ * Main logic which declare what should do robot in different situations
+ */
 void Logic::loopFunc()
 {
   if (_mode == Default)
@@ -90,13 +98,15 @@ void Logic::loopFunc()
     return;
 }
 
+/*
+ * Initialize all devices before main loop
+ */
 void Logic::init()
 {
   //Init Seral
   
   Serial.begin(9600);
-  Serial.println("[CORE] Initializing");  
-  Serial.println("This world is f*cking hard");
+  Serial.println("[CORE] Initializing");
 
   for (int i = 0; i < sizeof(devices_) / sizeof(Module); i++)
     ultrasonic.addDevice(devices_[i]);
@@ -105,6 +115,9 @@ void Logic::init()
   delay(500);
 }
 
+/*
+ * Exec functions when recived external commands
+ */
 void Logic::sendCommand(short unsigned int command)
 {
   if ( command == -1 ) stopMoving();
@@ -114,6 +127,9 @@ void Logic::sendCommand(short unsigned int command)
   if ( command == 3 ) moveRight();
 }
 
+/*
+ * Getting external commands
+ */
 void Logic::readExternalControls()
 {
   // Read com port from laptop

@@ -14,11 +14,13 @@
  * 13..15 - ultrasonic pins
  */
 
+// relay pins
 #define FIRSTCONTROLLPIN 9  
 #define SECONDCONTROLLPIN 10  
 #define THIRDCONTROLLPIN 11 
 #define FOURTHCONTROLLPIN 12
 
+// ultrasonic pins
 #define ULTRASONIC_ZERO_TRIG 4  
 #define ULTRASONIC_ZERO_ECHO 5  
 #define ULTRASONIC_FIRST_TRIG 6 
@@ -26,7 +28,7 @@
 #define ULTRASONIC_SECOND_TRIG 8  
 #define ULTRASONIC_SECOND_ECHO 13  
 #define ULTRASONIC_THIRD_TRIG 22
-#define ULTRASONIC_THIRD_ECHO 23
+#define ULTRASONIC_THIRD_ECHO 24
 
 // Main core  
 
@@ -35,6 +37,7 @@ Logic *core;
 void setup()  
 { 
   Module modules[4];
+  // making list of ultrasonic modules
   struct Module firstFrontModule = 
   { 
     .type = FRONT, 
@@ -53,19 +56,19 @@ void setup()
     .trigPin = ULTRASONIC_SECOND_TRIG, 
     .echoPin = ULTRASONIC_SECOND_ECHO 
   };
-
   struct Module firstBackModule = 
   { 
     .type = BACK, 
     .trigPin = ULTRASONIC_THIRD_TRIG, 
     .echoPin = ULTRASONIC_THIRD_ECHO 
   };
- 
+
   modules[0] = firstFrontModule;
   modules[1] = secondFrontModule;
   modules[2] = thirdFrontModule;
   modules[3] = firstBackModule;
-  
+
+  // declare main core
   core = new Logic( 
     FIRSTCONTROLLPIN,   
     SECONDCONTROLLPIN,  
@@ -74,6 +77,7 @@ void setup()
     modules  
   );    
 
+  // init all devices
   core->init();
   core->toggleMode(Walking);
 } 
